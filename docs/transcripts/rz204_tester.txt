@@ -1,0 +1,299 @@
+STUDENT_NAME: Rongsheng Zhang
+NETID: rz204
+OPTION: 2
+ROLE: tester
+AGENT_TOOL: Codex
+REPOSITORY_B_URL: https://github.com/RoyceZhang/IDS-706-Insurance-Rebuild
+===== TRANSCRIPT START =====
+
+[STUDENT]
+You are acting as the TESTER for my IDS 706 Week 4 Repository B assignment.
+
+This must be an independent review.
+
+The Architect and Builder stages are already complete.
+
+Please read:
+
+docs/plan.md
+
+Then independently inspect the current implementation.
+
+Do NOT assume the Builder implemented everything correctly.
+
+Please check:
+
+1. Whether the implementation matches docs/plan.md
+2. Whether the project structure is appropriate
+3. Whether the setup instructions actually match the code
+4. Whether typical cases are tested
+5. Whether meaningful edge cases are tested
+6. Whether data validation is correct
+7. Whether smoker encoding is correct
+8. Whether model training is reproducible
+9. Whether MSE and R-squared are calculated correctly
+10. Whether python -m src.main should run successfully
+11. Whether Dockerfile and .dockerignore are appropriate
+12. Whether README instructions are accurate
+13. Whether there are any unnecessary or overly complicated parts
+
+Please run or inspect:
+
+python -m pytest
+black --check src tests
+flake8 src tests
+
+If Docker is available, also check:
+
+docker build -t insurance-rebuild .
+docker run --rm insurance-rebuild
+
+Please explicitly identify:
+- what is correct
+- what is incomplete
+- any bugs
+- any missing edge cases
+- any mismatch with docs/plan.md
+
+If you identify important issues, explain the fixes clearly.
+
+Do not rewrite the entire project unless necessary.
+Keep fixes focused and beginner-friendly.
+
+[AGENT]
+I’ll treat this as an independent verification pass: first I’ll read the repository guidance and plan, then inspect the implementation and run the requested checks exactly as documented. I’ll only report focused fixes; I won’t modify the project unless the evidence shows that’s necessary and you’ve asked me to do so.
+
+<details><summary>Explored 10 files, a search, a list, ran 2 commands</summary>
+
+- Ran `pwd && rg --files -g 'AGENTS.md' -g '!venv' -g '!.venv' && git status --short && rg --files -g '!venv' -g '!.venv' | sort`
+
+<details><summary>Explored a list</summary>
+
+- Listed files
+
+</details>
+
+- Ran `git status --short`
+
+<details><summary>Explored 10 files, a search</summary>
+
+- Searched for `AGENTS.md` in `..`
+- Read `./docs/plan.md`
+- Read `./tests/test_insurance_analysis.py`
+- Read `./requirements.txt`
+- Read `./Dockerfile`
+- Read `./.dockerignore`
+- Read `./.flake8`
+- Read `./.gitignore`
+- Read `./src/insurance_analysis.py`
+- Read `./src/main.py`
+- Read `./README.md`
+
+</details>
+
+</details>
+
+The implementation is compact and broadly tracks the planned architecture, but I already see one documentation/structure discrepancy: the plan and README both promise `data/README.md` and transcript placeholders, while those files are absent from the working tree. I’m now running the quality gates and CLI, then I’ll probe validation and metric edge cases that the current tests do not cover.
+
+<details><summary>Ran 5 commands</summary>
+
+- Ran `python -m pytest`
+- Ran `docker --version`
+- Ran `python -m src.main`
+- Ran `black --check src tests`
+- Ran `flake8 src tests`
+
+</details>
+
+The format and lint checks pass. The host `pytest` and CLI failures are from the active global Python 3.10/Anaconda environment—not yet evidence of an application defect: it has incompatible NumPy/SciPy binaries and does not follow the README’s Python 3.11 virtual-environment setup. Docker is installed, so I’ll use the clean pinned Python 3.11 build as the decisive setup/reproducibility check, then distinguish repository defects from local-environment contamination.
+
+<details><summary>Ran 6 commands</summary>
+
+- Ran `docker build -t insurance-rebuild .`
+- Ran `docker build -t insurance-rebuild .`
+- Ran `docker run --rm insurance-rebuild`
+- Ran `docker run --rm insurance-rebuild python -m pytest -q`
+- Ran `docker run --rm insurance-rebuild black --check src tests`
+- Ran `docker run --rm insurance-rebuild flake8 src tests`
+
+</details>
+
+The clean Python 3.11 container is healthy: the image builds, the default analysis runs, all 17 tests pass, and Black/flake8 pass inside the image. I’m doing the final independent checks now: recomputing metrics from saved predictions, checking repeatability byte-for-byte, inspecting ignored/tracked artifacts, and testing malformed/degenerate inputs that aren’t represented in the suite.
+
+<details><summary>Explored 3 files, 4 lists, ran 15 commands</summary>
+
+- Ran `wc -l data/insurance.csv outputs/test_predictions.csv`
+
+<details><summary>Explored 2 files, 2 lists</summary>
+
+- Read `./outputs/analysis_summary.json`
+- Listed files in `.`
+- Listed files
+- Read `./data/README.md`
+
+</details>
+
+- Ran `git check-ignore -v outputs/analysis_summary.json outputs/model_metrics.json outputs/test_predictions.csv`
+
+<details><summary>Explored a file, a list</summary>
+
+- Read `./outputs/model_metrics.json`
+- Listed files in `data`
+
+</details>
+
+- Ran `.venv/bin/python -m pytest -q`
+
+- Ran `.venv/bin/black --check src tests`
+
+- Ran `.venv/bin/flake8 src tests`
+
+- Ran `.venv/bin/python -m src.main`
+
+- Ran `.venv/bin/python --version`
+
+- Ran `.venv/bin/python -c "import pandas, sklearn, pytest; print('pandas', pandas.__version__); print('scikit-learn', sklearn.__version__); print('pytest', pytest.__version__)"`
+
+- Ran `.venv/bin/python -c "import json,pandas as pd; from sklearn.metrics import mean_absolute_error,mean_squared_error,r2_score; p=pd.read_csv('outputs/test_predictions.csv'); a=p['actual_charges']; y=p['predicted_charges']; m=json.load(open('outputs/model_metrics.json')); print(mean_absolute_error(a,y),m['mean_absolute_error']); print(mean_squared_error(a,y),m['mean_squared_error']); print(mean_squared_error(a,y)**0.5,m['root_mean_squared_error']); print(r2_score(a,y),m['r_squared'])"`
+
+- Ran `shasum -a 256 outputs/analysis_summary.json outputs/model_metrics.json outputs/test_predictions.csv`
+
+- Ran `.venv/bin/python -m src.main`
+
+- Ran `shasum -a 256 outputs/analysis_summary.json outputs/model_metrics.json outputs/test_predictions.csv`
+
+- Ran `python3.11 --version`
+
+<details><summary>Explored a list</summary>
+
+- Listed files in `.`
+
+</details>
+
+- Ran `git status --short --ignored`
+
+- Ran `.venv/bin/python -c "import pandas as pd; from src.insurance_analysis import validate_data; base=dict(age=[20],sex=['female'],bmi=[22.0],children=[0],smoker=['no'],region=['east'],charges=[100.0]); cases=[('numeric text',{'age':['oops']}),('infinity',{'bmi':[float('inf')]}),('blank sex',{'sex':['  ']}),('negative children',{'children':[-1]})]; [(lambda name,change: (lambda d: (validate_data(d), print(name,'UNEXPECTED PASS')))(pd.DataFrame({**base,**change})))(n,c) for n,c in cases]"`
+
+</details>
+
+The saved MAE, MSE, RMSE, and R² exactly match independent recomputation from `test_predictions.csv`, and rerunning the workflow produces byte-identical artifacts. One submission-level issue is now confirmed: Git currently tracks zero files, so a “clean checkout” would contain none of the project until the intended files are added and committed. I’ll do one uncached Docker build to verify dependency installation rather than relying on a previous build layer.
+
+<details><summary>Explored 8 files, ran 3 commands</summary>
+
+- Ran `docker build --no-cache -t insurance-rebuild .`
+
+- Ran `docker run --rm insurance-rebuild`
+
+- Ran `docker run --rm insurance-rebuild python -m pytest -q`
+
+<details><summary>Explored 8 files</summary>
+
+- Read `./src/insurance_analysis.py`
+- Read `./Dockerfile`
+- Read `./tests/test_insurance_analysis.py`
+- Read `./.dockerignore`
+- Read `./README.md`
+- Read `./docs/plan.md`
+- Read `./src/main.py`
+- Read `./requirements.txt`
+
+</details>
+
+</details>
+
+## Independent tester result
+
+The core implementation is correct and beginner-friendly. I found no calculation, smoker-encoding, validation, or reproducibility bug. The project passes all checks in the documented Python 3.11 environment and in Docker.
+
+However, the repository is not submission-ready because required documentation is missing and Git currently tracks zero files.
+
+### Important findings
+
+1. **High — Nothing is tracked by Git**
+
+   `git ls-files` returned no files, and every project file appears as untracked. Therefore, the “clean checkout” acceptance criterion in [docs/plan.md](./docs/plan.md:13) is not currently achievable.
+
+   Fix: review the files, then add and commit the intended repository contents. Keep `.venv`, caches, and generated outputs ignored.
+
+2. **Medium — `data/README.md` is missing**
+
+   Both the plan and [README.md](./README.md:21) say this file exists. The plan requires it to document the dataset’s exact source, schema, and validation assumptions.
+
+   Fix: add `data/README.md` with verified provenance. Do not guess the source URL or license.
+
+3. **Medium — README prematurely claims Tester work was completed**
+
+   [README.md](./README.md:165) says the Tester findings were reviewed and fixed, but this independent review had not yet happened. That conflicts with the plan’s instruction not to fabricate results.
+
+   Fix: replace that language with this review’s actual findings and verification results after addressing them.
+
+4. **Medium — Required transcripts are not present**
+
+   `docs/transcripts/` contains only `.gitkeep`. The plan says the Architect, Builder, and Tester transcripts should be saved there according to course submission rules.
+
+### Verification results
+
+- `black --check src tests`: passed.
+- `flake8 src tests`: passed.
+- Python 3.11 virtual environment: 17 tests passed.
+- `python -m src.main` under the documented Python 3.11 environment: passed.
+- Uncached Docker build: passed.
+- `docker run --rm insurance-rebuild`: passed.
+- Containerized pytest: 17 tests passed.
+- Containerized Black and flake8: passed.
+- All three output files were generated and parsed successfully.
+- Two consecutive runs produced byte-identical outputs.
+
+The initial unactivated `python -m pytest` and `python -m src.main` commands failed because the shell’s default `python` was an unrelated Python 3.10 Anaconda installation with incompatible NumPy/SciPy binaries. After using the README’s Python 3.11 virtual environment, both passed. This is a local-environment problem, not an implementation failure.
+
+### What is correct
+
+- Project structure is suitably small: one substantive analysis module and one CLI module.
+- Required columns and missing values are checked.
+- Categorical values are stripped and lowercased.
+- Numeric values must be finite and satisfy the documented ranges.
+- `children` must be integer-valued.
+- Exact duplicates are removed and counted.
+- Smoker validation accepts only `yes` and `no`.
+- Smoker encoding is exactly `no → 0`, `yes → 1`.
+- Model inputs are exactly `age`, `bmi`, `children`, and `smoker_encoded`; `charges` is not leaked into the features.
+- The split is 80/20 with `random_state=42`.
+- Predictions are sorted by original row index.
+- Fewer than ten cleaned rows are rejected.
+- Correlation becomes JSON `null` when undefined.
+- The Dockerfile and `.dockerignore` are minimal and appropriate.
+- No unnecessary pipeline, scaling, imputation, Docker Compose, or other excess complexity was added.
+
+### Metric verification
+
+Independent recomputation from `test_predictions.csv` matched the saved metrics:
+
+- MAE: `4198.592612356365`
+- MSE: `35914551.48043363`
+- RMSE: `5992.875059638206`
+- R²: `0.8045531086669288`
+
+Thus, MSE, RMSE, and R² are calculated correctly.
+
+### Missing edge-case tests
+
+The existing tests cover the cases explicitly listed in the plan and add a useful constant-correlation case. Useful focused additions would be:
+
+- Empty CSV and missing-file behavior.
+- Nonnumeric and infinite numeric values.
+- Exactly ten rows, testing the accepted minimum boundary.
+- A dataset that produces negative R², confirming it is reported rather than rejected.
+- CLI behavior for invalid input, including a nonzero exit code and useful error message.
+- Blank `sex`, although blank `region` already exercises the shared categorical validation path.
+
+These are test-coverage improvements; inspection did not reveal corresponding implementation bugs.
+
+### Overall verdict
+
+**Core code: pass.**
+**Tests, metrics, reproducibility, CLI, and Docker: pass.**
+**Repository/submission completeness: fail until files are tracked, `data/README.md` is added, transcripts are saved, and the Tester section is updated with real findings.**
+
+No project files were modified during this independent review.
+
+===== TRANSCRIPT END =====
